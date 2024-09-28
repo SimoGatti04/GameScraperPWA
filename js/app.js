@@ -12,6 +12,7 @@ async function fetchGameData() {
         mode: 'cors',
         headers: {
             'Content-Type': 'application/json',
+            'bypass-tunnel-reminder': 'true'
         },
         rejectUnauthorized: false
     });
