@@ -7,7 +7,7 @@ const API_URL = config.apiBaseUrl;
 let gameData = null;
 
 async function fetchGameData() {
-    const response = await fetch(API_URL, {
+    const response = await fetch(`${API_URL}/api/gameData`, {
         method: 'GET',
         mode: 'cors',
         headers: {
