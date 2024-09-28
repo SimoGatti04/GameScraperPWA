@@ -1,3 +1,3 @@
 export const config = {
-    apiBaseUrl: 'https://simogatti.pagekite.me',
+    apiBaseUrl: 'http://simogatti.pagekite.me',
 }
