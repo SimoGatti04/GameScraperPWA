@@ -83,7 +83,7 @@ function createSitePriceChart(siteData) {
         label: site.site,
         data: site.priceHistory.map(entry => ({
             x: new Date(entry.timestamp),
-            y: parseFloat(entry.price)
+            y: typeof entry.price === 'string' ? parseFloat(entry.price.replace(/[^0-9.]/g, '')) : entry.price
         })),
         borderColor: siteColors[site.site],
         backgroundColor: siteColors[site.site],
@@ -103,9 +103,9 @@ function createSitePriceChart(siteData) {
                 x: {
                     type: 'time',
                     time: {
-                        unit: 'day',
+                        unit: 'hour',
                         displayFormats: {
-                            day: 'dd/mm/yy HH:mm'
+                            hour: 'dd/MM/yy HH:mm'
                         }
                     },
                     title: {
@@ -165,14 +165,18 @@ function createOverallLowestPriceChart(overallLowestPrices) {
                 x: {
                     type: 'time',
                     time: {
-                        unit: 'day',
+                        unit: 'hour',
                         displayFormats: {
-                            day: 'dd/mm/yy HH:mm'
+                            hour: 'dd/MM/yy HH:mm'
                         }
                     },
                     title: {
                         display: true,
                         text: 'Data e Ora'
+                    },
+                    ticks: {
+                        autoSkip: true,
+                        maxTicksLimit: 10
                     }
                 },
                 y: {
