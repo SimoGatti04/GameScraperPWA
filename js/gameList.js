@@ -1,9 +1,24 @@
+import { addNewTracker } from './app.js';
+
 export function renderGameList(gameData) {
     const gameListElement = document.getElementById('gameList');
     gameListElement.innerHTML = '';
 
-    const gamePreview = createGamePreview(gameData);
-    gameListElement.appendChild(gamePreview);
+    gameData.forEach(game => {
+        const gamePreview = createGamePreview(game);
+        gameListElement.appendChild(gamePreview);
+    });
+
+    // Add a button to create new trackers
+    const addTrackerButton = document.createElement('button');
+    addTrackerButton.textContent = 'Add New Tracker';
+    addTrackerButton.addEventListener('click', () => {
+        const gameName = prompt('Enter the name of the game to track:');
+        if (gameName) {
+            addNewTracker(gameName);
+        }
+    });
+    gameListElement.appendChild(addTrackerButton);
 }
 
 function createGamePreview(game) {
@@ -11,7 +26,7 @@ function createGamePreview(game) {
     preview.classList.add('game-preview');
     preview.dataset.title = game.title;
 
-    const priceComparison = comparePrices(game.currentLowestPrice.price, game.previousLowestPrice);
+    const priceComparison = comparePrices(game.currentLowestPrice.price, game.previousLowestPrice.price);
     const priceColor = getPriceColor(priceComparison);
 
     preview.innerHTML = `

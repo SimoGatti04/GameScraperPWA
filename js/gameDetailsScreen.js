@@ -1,10 +1,12 @@
-export function showGameDetailsScreen(gameData) {
+export function showGameDetailsScreen(gameData, clickedGameTitle) {
     const mainElement = document.getElementById('app');
     mainElement.innerHTML = '';
 
-    const detailsScreen = createDetailsScreen(gameData);
+    const game = gameData.find(g => g.title === clickedGameTitle);
+    const detailsScreen = createDetailsScreen(game);
     mainElement.appendChild(detailsScreen);
 }
+
 
 function createDetailsScreen(game) {
     const screen = document.createElement('div');
@@ -35,7 +37,13 @@ function createDetailsScreen(game) {
 function createSitePriceInfo(siteData, overallAveragePrice) {
     const currentPrice = parseFloat(siteData.currentPrice.price.replace(/[^0-9.]/g, ''));
     const averagePrice = parseFloat(siteData.averagePrice);
-    const lastPrice = siteData.priceHistory[siteData.priceHistory.length - 2].price;
+    let lastPrice;
+    if (siteData.priceHistory.length > 1) {
+        lastPrice = siteData.priceHistory[siteData.priceHistory.length - 2].price;
+    }
+    else {
+        lastPrice = siteData.currentPrice.price;
+    }
 
     const vsAverage = getPriceComparisonText(currentPrice, averagePrice);
     const vsOverall = getPriceComparisonText(currentPrice, overallAveragePrice);
