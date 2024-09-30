@@ -66,20 +66,25 @@ function createSitePriceInfo(siteData, overallAveragePrice) {
 function createPriceHistoryChart(siteData, overallLowestPrices) {
     const chartContainer = document.createElement('div');
     chartContainer.innerHTML = `
-        <canvas id="priceHistoryChart"></canvas>
-        <canvas id="overallLowestPriceChart"></canvas>
+        <canvas id="priceHistoryChart" class="clickable-chart"></canvas>
+        <canvas id="overallLowestPriceChart" class="clickable-chart"></canvas>
     `;
 
     setTimeout(() => {
         createSitePriceChart(siteData);
         createOverallLowestPriceChart(overallLowestPrices);
+
+        // Aggiungi event listeners per i grafici
+        document.getElementById('priceHistoryChart').addEventListener('click', () => openFullScreenChart('priceHistoryChart', siteData));
+        document.getElementById('overallLowestPriceChart').addEventListener('click', () => openFullScreenChart('overallLowestPriceChart', overallLowestPrices));
     }, 0);
 
     return chartContainer.innerHTML;
 }
 
-function createSitePriceChart(siteData) {
-    const ctx = document.getElementById('priceHistoryChart').getContext('2d');
+
+function createSitePriceChart(siteData, canvas = null, customOptions = {}) {
+    const ctx = canvas ? canvas.getContext('2d') : document.getElementById('priceHistoryChart').getContext('2d');
     const siteColors = {
         'Gamivo': 'rgba(255, 165, 0, 0.8)',
         'Eneba': 'rgba(128, 0, 128, 0.8)',
@@ -98,46 +103,58 @@ function createSitePriceChart(siteData) {
         fill: false
     }));
 
-    new Chart(ctx, {
-        type: 'line',
-        data: { datasets },
-        options: {
-            responsive: true,
-            title: {
-                display: true,
-                text: 'Cronologia prezzi per sito'
-            },
-            scales: {
-                x: {
-                    type: 'time',
-                    time: {
-                        unit: 'hour',
-                        displayFormats: {
-                            hour: 'dd/MM/yy HH:mm'
-                        }
-                    },
-                    title: {
-                        display: true,
-                        text: 'Data e Ora'
-                    },
-                    ticks: {
-                        autoSkip: true,
-                        maxTicksLimit: 10
+    const defaultOptions = {
+        responsive: true,
+        title: {
+            display: true,
+            text: 'Cronologia prezzi per sito'
+        },
+        scales: {
+            x: {
+                type: 'time',
+                time: {
+                    unit: 'hour',
+                    displayFormats: {
+                        hour: 'dd/MM/yy HH:mm'
                     }
                 },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Prezzo'
-                    }
+                title: {
+                    display: true,
+                    text: 'Data e Ora'
+                },
+                ticks: {
+                    autoSkip: true,
+                    maxTicksLimit: 10
+                }
+            },
+            y: {
+                title: {
+                    display: true,
+                    text: 'Prezzo'
+                },
+                min: function (context) {
+                    const min = Math.min(...context.chart.data.datasets.flatMap(d => d.data.map(p => p.y)));
+                    return min - 3;
+                },
+                max: function (context) {
+                    const max = Math.max(...context.chart.data.datasets.flatMap(d => d.data.map(p => p.y)));
+                    return max + 3;
                 }
             }
         }
+    };
+
+    const chartOptions = { ...defaultOptions, ...customOptions };
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {datasets},
+        options: chartOptions
     });
 }
 
-function createOverallLowestPriceChart(overallLowestPrices) {
-    const ctx = document.getElementById('overallLowestPriceChart').getContext('2d');
+function createOverallLowestPriceChart(overallLowestPrices, canvas = null, customOptions = {}) {
+    const ctx = canvas ? canvas.getContext('2d') : document.getElementById('overallLowestPriceChart').getContext('2d');
 
     let data = [];
     if (Array.isArray(overallLowestPrices)) {
@@ -152,6 +169,41 @@ function createOverallLowestPriceChart(overallLowestPrices) {
         }));
     }
 
+    const defaultOptions = {
+        responsive: true,
+        title: {
+            display: true,
+            text: 'Cronologia del prezzo più basso generale'
+        },
+        scales: {
+            x: {
+                type: 'time',
+                time: {
+                    unit: 'hour',
+                    displayFormats: {
+                        hour: 'dd/MM/yy HH:mm'
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Data e Ora'
+                },
+                ticks: {
+                    autoSkip: true,
+                    maxTicksLimit: 10
+                }
+            },
+            y: {
+                title: {
+                    display: true,
+                    text: 'Prezzo'
+                }
+            }
+        }
+    };
+
+    const chartOptions = { ...defaultOptions, ...customOptions };
+
     new Chart(ctx, {
         type: 'line',
         data: {
@@ -163,40 +215,39 @@ function createOverallLowestPriceChart(overallLowestPrices) {
                 fill: true
             }]
         },
-        options: {
-            responsive: true,
-            title: {
-                display: true,
-                text: 'Cronologia del prezzo più basso generale'
-            },
-            scales: {
-                x: {
-                    type: 'time',
-                    time: {
-                        unit: 'hour',
-                        displayFormats: {
-                            hour: 'dd/MM/yy HH:mm'
-                        }
-                    },
-                    title: {
-                        display: true,
-                        text: 'Data e Ora'
-                    },
-                    ticks: {
-                        autoSkip: true,
-                        maxTicksLimit: 10
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Prezzo'
-                    }
-                }
-            }
-        }
+        options: chartOptions
     });
 }
+
+function openFullScreenChart(chartId, data) {
+    const modal = document.createElement('div');
+    modal.className = 'chart-modal';
+    modal.innerHTML = `
+        <div class="chart-modal-content">
+            <span class="close-modal">&times;</span>
+            <canvas id="fullScreenChart"></canvas>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    const closeBtn = modal.querySelector('.close-modal');
+    closeBtn.addEventListener('click', () => modal.remove());
+
+    const fullScreenCanvas = document.getElementById('fullScreenChart');
+
+    const fullScreenOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        aspectRatio: 2, // Questo allungherà il grafico verticalmente
+    };
+
+    if (chartId === 'priceHistoryChart') {
+        createSitePriceChart(data, fullScreenCanvas, fullScreenOptions);
+    } else if (chartId === 'overallLowestPriceChart') {
+        createOverallLowestPriceChart(data, fullScreenCanvas, fullScreenOptions);
+    }
+}
+
 
 function getPriceComparisonText(current, comparison) {
     if (current < comparison) return 'minore';

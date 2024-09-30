@@ -67,3 +67,42 @@ button:hover {
 .hidden {
     display: none;
 }
+
+.clickable-chart {
+    cursor: pointer;
+}
+
+.chart-modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chart-modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    width: 90%;
+    height: 90%;
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+#fullScreenChart {
+    width: 100%;
+    height: calc(100% - 40px);
+}
