@@ -5,7 +5,7 @@ let apiBaseUrl = '';
 if (isTestMode) {
     apiBaseUrl = 'http://localhost:8080';
 } else {
-    apiBaseUrl = 'gamescraper.simogatti.site';
+    apiBaseUrl = 'https://gamescraper.simogatti.site';
 }
 
 export const config = {
